@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECH_DESIGN.md</title><style>
+:root { --primary:#7c5cff; --bg:#f7f8fc; --text:#1f2430; --dim:#5a6378; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:var(--bg); color:var(--text); line-height:1.8; padding:40px; }
+.docs { max-width:860px; margin:0 auto; background:#fff; border-radius:12px; padding:48px 56px; box-shadow:0 6px 28px rgba(0,0,0,.08); }
+h1 { font-size:26px; border-bottom:2px solid var(--primary); padding-bottom:12px; margin-bottom:22px; color:#141a26; }
+h2 { font-size:20px; margin:30px 0 12px; color:var(--primary); }
+h3 { font-size:16px; margin:22px 0 8px; }
+p { margin:8px 0; }
+ul,ol { margin:8px 0 8px 26px; }
+li { margin:4px 0; }
+table { border-collapse:collapse; width:100%; margin:12px 0; font-size:14px; }
+th,td { border:1px solid #dfe3ec; padding:8px 12px; text-align:left; }
+th { background:#f0f2fa; }
+code { background:#eef0f7; padding:2px 6px; border-radius:4px; font-size:13px; }
+strong { color:#141a26; }
+</style></head><body><div class="docs"><h1>个人网站 技术设计文档（TECH_DESIGN.md）</h1>
+<h2>一、技术栈选择</h2>
+<table><thead><tr><th>层</th><th>选型</th><th>版本</th><th>选择理由</th></tr></thead><tbody><tr><td>前端框架</td><td>React</td><td>18</td><td>组件化开发，生态成熟，适合单页站点</td></tr><tr><td>开发语言</td><td>TypeScript</td><td>5.x</td><td>类型安全，减少运行时错误</td></tr><tr><td>构建工具</td><td>Vite</td><td>5.x</td><td>启动快、构建快，开箱即用</td></tr><tr><td>路由</td><td>React Router</td><td>6.x</td><td>单页应用路由管理</td></tr><tr><td>样式</td><td>原生 CSS + CSS 变量</td><td>—</td><td>深色主题统一管理，无需引入重型 UI 库</td></tr><tr><td>星空背景</td><td>Canvas 原生绘制</td><td>—</td><td>粒子闪烁 + 视差，性能可控</td></tr><tr><td>部署</td><td>Vercel / Cloudflare Pages</td><td>—</td><td>免费托管，支持静态站点，全球 CDN</td></tr></tbody></table>
+<p><em>说明：不引入 Tailwind 等额外依赖，使用 CSS 变量统一主题，保证项目轻量、可直接运行。</em></p>
+<h2>二、项目结构</h2>
+<p><code>`</code></p>
+<p>personal-site/</p>
+<p>├── PRD.md              # 产品需求文档</p>
+<p>├── TECH_DESIGN.md      # 本技术设计文档</p>
+<p>├── AGENTS.md           # AI 代理开发规范</p>
+<p>├── index.html          # Vite 入口 HTML</p>
+<p>├── package.json        # 依赖与脚本</p>
+<p>├── tsconfig.json       # TypeScript 配置</p>
+<p>├── vite.config.ts      # Vite 配置</p>
+<p>├── public/             # 静态资源（favicon 等）</p>
+<p>└── src/</p>
+<p>    ├── main.tsx        # 应用入口</p>
+<p>    ├── App.tsx         # 根组件（路由 + 布局）</p>
+<p>    ├── index.css       # 全局样式 + 主题变量</p>
+<p>    ├── data/</p>
+<p>    │   └── content.ts  # 个人信息、技能、项目、博客数据</p>
+<p>    ├── components/</p>
+<p>    │   ├── Navbar.tsx      # 吸顶导航（含移动端汉堡菜单）</p>
+<p>    │   ├── Footer.tsx      # 页脚</p>
+<p>    │   ├── Starfield.tsx   # Canvas 星空背景</p>
+<p>    │   ├── Hero.tsx        # 首页首屏</p>
+<p>    │   ├── About.tsx       # 个人介绍</p>
+<p>    │   ├── Skills.tsx      # 技能展示</p>
+<p>    │   ├── Projects.tsx    # 项目展示</p>
+<p>    │   ├── Blog.tsx        # 博客列表</p>
+<p>    │   └── Contact.tsx     # 联系模块</p>
+<p>    └── pages/</p>
+<p>        └── Home.tsx        # 首页（单页滚动）</p>
+<p><code>`</code></p>
+<h2>三、数据模型</h2>
+<h3>3.1 个人信息 Profile</h3>
+<p><code>`</code>ts</p>
+<p>interface Profile {</p>
+<p>  name: string;        // 姓名</p>
+<p>  title: string;       // 职位/专业</p>
+<p>  intro: string;       // 一句话介绍</p>
+<p>  education: string;   // 教育背景</p>
+<p>  email: string;       // 邮箱</p>
+<p>  avatar: string;      // 头像（本地图片路径）</p>
+<p>}</p>
+<p><code>`</code></p>
+<h3>3.2 技能 Skill</h3>
+<p><code>`</code>ts</p>
+<p>interface Skill {</p>
+<p>  category: string;    // 分类（如 前端 / 后端 / 物联网）</p>
+<p>  name: string;        // 技能名称</p>
+<p>  level: number;       // 熟练度 1-100</p>
+<p>  icon: string;        // 图标（emoji 或 SVG 文本）</p>
+<p>}</p>
+<p><code>`</code></p>
+<h3>3.3 项目 Project</h3>
+<p><code>`</code>ts</p>
+<p>interface Project {</p>
+<p>  id: string;          // 唯一标识</p>
+<p>  title: string;       // 项目名称</p>
+<p>  description: string; // 项目描述</p>
+<p>  tags: string[];      // 技术标签</p>
+<p>  link: string;        // 项目链接</p>
+<p>  year: string;        // 完成时间</p>
+<p>}</p>
+<p><code>`</code></p>
+<h3>3.4 博客文章 Post</h3>
+<p><code>`</code>ts</p>
+<p>interface Post {</p>
+<p>  id: string;</p>
+<p>  title: string;</p>
+<p>  summary: string;</p>
+<p>  date: string;</p>
+<p>  tags: string[];</p>
+<p>}</p>
+<p><code>`</code></p>
+<h2>四、关键技术点</h2>
+<h3>4.1 星空背景（Canvas 粒子）</h3>
+<ul><li>使用 <code>requestAnimationFrame</code> 循环绘制粒子</li></ul>
+<ul><li>每个粒子：随机位置、大小、闪烁速度，透明度正弦变化模拟闪烁</li></ul>
+<ul><li>鼠标移动时粒子产生轻微视差偏移</li></ul>
+<ul><li>移动端（视口 &lt; 768px）粒子数量减半</li></ul>
+<ul><li>尊重 <code>prefers-reduced-motion</code>，用户偏好减弱动效时不启动动画</li></ul>
+<h3>4.2 响应式布局</h3>
+<ul><li>使用 CSS Grid + <code>repeat(auto-fit, minmax())</code> 实现卡片自适应</li></ul>
+<ul><li>断点：&lt;640px 单列 / 640-1024px 两列 / &gt;1024px 三列</li></ul>
+<ul><li>导航在移动端折叠为汉堡菜单</li></ul>
+<h3>4.3 滚动动画</h3>
+<ul><li><code>IntersectionObserver</code> 监听元素进入视口，触发淡入上移</li></ul>
+<h2>五、开发与运行</h2>
+<p><code>`</code>bash</p>
+<p>npm install        # 安装依赖</p>
+<p>npm run dev        # 本地开发（默认 http://localhost:5173）</p>
+<p>npm run build      # 构建生产版本（输出 dist/）</p>
+<p>npm run preview    # 本地预览构建产物</p>
+<p><code>`</code></p>
+<h2>六、部署方案</h2>
+<ol><li>代码推送到 GitHub 仓库</li></ol>
+<ol><li>Vercel / Cloudflare Pages 导入该仓库</li></ol>
+<ol><li>框架预设选择 Vite，构建命令 <code>npm run build</code>，输出目录 <code>dist</code></li></ol>
+<ol><li>部署完成后获得免费域名 <code>xxx.pages.dev</code> 或 <code>xxx.vercel.app</code></li></ol></div></body></html>

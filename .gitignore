@@ -1,0 +1,5 @@
+node_modules/
+dist/
+*.log
+tsc_out.txt
+build_out.txt
